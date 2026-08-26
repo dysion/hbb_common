@@ -208,7 +208,7 @@ pub fn get_hardcoded_servers_json() -> String {
             })
         })
         .collect();
-    list.to_string()
+    serde_json::to_string(&list).unwrap_or_default()
 }
 
 pub const RENDEZVOUS_PORT: i32 = 1116;
