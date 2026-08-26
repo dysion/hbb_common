@@ -159,6 +159,58 @@ const CHARS: &[char] = &[
 pub const RENDEZVOUS_SERVERS: &[&str] = &["194.169.54.16"];
 pub const RS_PUB_KEY: &str = "U1eA42GlEDBwj7aZv4ITLla6yDxAkT2BOjiHmSHs4GY=";
 
+/// A hardcoded server entry selectable by the user on the Settings page.
+pub struct HardcodedServer {
+    pub name: &'static str,
+    pub rendezvous_server: &'static str,
+    pub relay_server: &'static str,
+    pub key: &'static str,
+}
+
+/// Hardcoded selectable servers. Entries with an empty `rendezvous_server` are
+/// reserved placeholders and are hidden from the UI until filled in.
+pub const HARDCODED_SERVERS: &[HardcodedServer] = &[
+    HardcodedServer {
+        name: "Server-EU",
+        rendezvous_server: "194.169.54.16",
+        relay_server: "194.169.54.16",
+        key: "U1eA42GlEDBwj7aZv4ITLla6yDxAkT2BOjiHmSHs4GY=",
+    },
+    // Reserved slot: fill in rendezvous_server / key to enable.
+    HardcodedServer {
+        name: "Server-GZ",
+        rendezvous_server: "106.12.132.200",
+        relay_server: "106.12.132.200",
+        key: "Wdefx+3Pq+ivWkxBPV8kHNvDtnGjIbCaeDQmkxdEnwU=",
+    },
+    // Reserved slot: fill in rendezvous_server / key to enable.
+    HardcodedServer {
+        name: "Unused",
+        rendezvous_server: "",
+        relay_server: "",
+        key: "",
+    },
+];
+
+/// JSON array of the available (non-empty) hardcoded servers for the Flutter UI.
+/// e.g. [{"name":"Server-1","rendezvous_server":"1.2.3.4","relay_server":"1.2.3.4","key":"..."}]
+pub fn get_hardcoded_servers_json() -> String {
+    use serde_json::json;
+    let list: Vec<_> = HARDCODED_SERVERS
+        .iter()
+        .filter(|s| !s.rendezvous_server.is_empty())
+        .map(|s| {
+            json!({
+                "name": s.name,
+                "rendezvous_server": s.rendezvous_server,
+                "relay_server": if s.relay_server.is_empty() { s.rendezvous_server } else { s.relay_server },
+                "key": s.key,
+            })
+        })
+        .collect();
+    list.to_string()
+}
+
 pub const RENDEZVOUS_PORT: i32 = 1116;
 pub const RELAY_PORT: i32 = 1117;
 pub const WS_RENDEZVOUS_PORT: i32 = 1118;
